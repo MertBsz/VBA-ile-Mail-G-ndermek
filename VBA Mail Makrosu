@@ -1,0 +1,54 @@
+Option Explicit
+Sub SendEmail()
+Dim CDO_Mail As Object
+Dim CDO_Config As Object
+Dim SMTP_Config As Variant
+Dim strSubject As String
+Dim strFrom As String
+Dim strTo As String
+Dim strCc As String
+Dim strBcc As String
+Dim strBody As String
+strSubject = "Share update"
+strFrom = "sender email"
+strTo = "receiver email"
+strCc = ""
+strBcc = ""
+strBody = "test"
+Set CDO_Mail = CreateObject("CDO.Message")
+On Error GoTo Error_Handling
+Set CDO_Config = CreateObject("CDO.Configuration")
+CDO_Config.Load -1
+Set SMTP_Config = CDO_Config.Fields
+With SMTP_Config
+    .Item("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+    .Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "server hostName"
+    .Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate") = 1
+    .Item("http://schemas.microsoft.com/cdo/configuration/sendusername") = strFrom
+    .Item("http://schemas.microsoft.com/cdo/configuration/sendpassword") = "sender mail password"
+    .Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 587
+    .Item("http://schemas.microsoft.com/cdo/configuration/smtpusessl") = False
+    
+    .Update
+    
+    End With
+    
+    With CDO_Mail
+    Set .Configuration = CDO_Config
+    End With
+    
+    CDO_Mail.Subject = strSubject
+    CDO_Mail.From = strFrom
+    CDO_Mail.To = strTo
+    CDO_Mail.TextBody = strBody
+    CDO_Mail.CC = strCc
+    CDO_Mail.BCC = strBcc
+    CDO_Mail.Send
+    
+Error_Handling:
+    If Err.Description <> "" Then MsgBox Err.Description
+    
+    
+    End Sub
+
+
